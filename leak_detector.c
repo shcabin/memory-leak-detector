@@ -189,7 +189,7 @@ char * xstrdup (const char *str, const char * file, unsigned int line)
 	char * ptr = strdup (str);
 	if (ptr != NULL) 
 	{
-		add_mem_info(ptr, strlen(str), file, line);
+		add_mem_info(ptr, strlen(str)+1, file, line);
 	}
 	return ptr;
 }
