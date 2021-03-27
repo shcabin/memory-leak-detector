@@ -281,6 +281,7 @@ add_mem_info (void *mem_ref, unsigned int size, const char *file,
 void
 remove_mem_info (void *mem_ref)
 {
+  if (mem_ref==NULL) return;
   unsigned short index;
   MEM_LEAK *leak_info;
   int flag = 0;
@@ -300,6 +301,7 @@ remove_mem_info (void *mem_ref)
   MUTEX_UNLOCK (leak_ctx.g_cs);
   if (flag == 0)
     {
+      fprintf(stderr, "undefined %p\n",  mem_ref);
       assert (0);
       printf ("remove memory error!");
     }
