@@ -4,16 +4,19 @@
 
 #include "leak_detector.h"
 
-void main()
+int
+main ()
 {
-	void *ptr;
-	ptr=malloc(256);
-	ptr=malloc(128);
-	strdup("0123456789abcdef");
-	calloc(1,32);
+  atexit(report_mem_leak);
+  void *ptr;
+  ptr = malloc (256);
+  memset(ptr, 5, 256);
+  ptr = malloc (128);
+  strdup ("0123456789abcdef");
+  calloc (1, 32);
 
-	free(ptr);
-	report_mem_leak();
+  free (ptr);
+  return 0;
 }
 
 /*output maybe like this
@@ -40,5 +43,3 @@ line:12 file    : test.c
 --------------------------------
 
 */
-
-
