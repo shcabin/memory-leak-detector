@@ -45,12 +45,12 @@ struct _MEM_LEAK
 };
 typedef struct _MEM_LEAK MEM_LEAK;
 
-void add (MEM_INFO alloc_info);
-void erase (unsigned pos);
-void clear (void);
-void add_mem_info (void *mem_ref, unsigned int size, const char *file,
+static void add (MEM_INFO alloc_info);
+static void erase (unsigned pos);
+static void clear (void);
+static void add_mem_info (void *mem_ref, unsigned int size, const char *file,
                    unsigned int line, const char *func);
-void remove_mem_info (void *mem_ref);
+static void remove_mem_info (void *mem_ref);
 
 typedef struct _MEM_LEAK_ctx
 {
@@ -70,7 +70,7 @@ static MEM_LEAK_ctx leak_ctx = { 0 };
  * adds allocated memory info. into the list
  *
  */
-void
+static void
 add (MEM_INFO alloc_info)
 {
 
@@ -115,7 +115,7 @@ add (MEM_INFO alloc_info)
  * erases memory info. from the list
  *
  */
-void
+static void
 erase (unsigned pos)
 {
 
@@ -155,7 +155,7 @@ erase (unsigned pos)
 /*
  * deletes all the elements from the list
  */
-void
+static void
 clear ()
 {
   MEM_LEAK *temp = ptr_start;
@@ -249,7 +249,7 @@ xfree (void *mem_ref)
  * gets the allocated memory info and adds it to a list
  *
  */
-void
+static void
 add_mem_info (void *mem_ref, unsigned int size, const char *file,
               unsigned int line, const char *func)
 {
@@ -278,7 +278,7 @@ add_mem_info (void *mem_ref, unsigned int size, const char *file,
  * if the allocated memory info is part of the list, removes it
  *
  */
-void
+static void
 remove_mem_info (void *mem_ref)
 {
   if (mem_ref==NULL) return;
@@ -307,7 +307,7 @@ remove_mem_info (void *mem_ref)
     }
 }
 
-int
+static int
 ld_hex_printout (char *out_buf, const char *buf, unsigned int len, int wide)
 {
   int i;
@@ -375,13 +375,14 @@ report_mem_leak (void)
 {
   MEM_LEAK *leak_info;
 
-  FILE *fp_write = stdout;
+  //FILE *fp_write = stdout;
   char info[1024];
   int print_size;
-  if (fp_write != NULL)
+  if (ptr_start!=NULL)
     {
       puts("Memory Leak Summary");
       puts("-----------------------------------");
+      puts("REPORT THIS LEAK TO https://github.com/harieamjari/dats");
 
       fprintf (stdout, "leak total:%d,max used size:%d,once max:%d\n\n",
                leak_ctx.total, leak_ctx.used_max, leak_ctx.once_max);
@@ -401,13 +402,13 @@ report_mem_leak (void)
             leak_info->mem_info.size > 64 ? 64 : leak_info->mem_info.size;
           ld_hex_printout (info, (char *) leak_info->mem_info.address,
                            print_size, 16);
-          fwrite (info, (strlen (info)), 1, fp_write);
+          fwrite (info, (strlen (info)), 1, stdout);
 
         putchar('\n');
         }
-      fflush (fp_write);
+      fflush (stdout);
+      fprintf (stdout, "-----------------------------------\n");
     }
-          fprintf (stdout, "-----------------------------------\n");
   clear ();
   MUTEX_DESTROY (leak_ctx.g_cs);
 }
