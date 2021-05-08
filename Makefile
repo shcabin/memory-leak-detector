@@ -1,13 +1,9 @@
 CC = gcc
-CFLAGS = -Wall
-
-#LIBS = -l pthread -l dl
-LIBS = 
+CFLAGS = -Wall -Wextra
 
 
-leak_detector.o: leak_detector.c
-	$(CC) -c $(CFLAGS) $< -o $@  
+a.out : leak_detector.c test.c
+	$(CC) $(CFLAGS) $^ -o $@  
  
-
 clean:
-	rm *.o -rf
+	rm a.out
