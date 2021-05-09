@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 // This macro must be only define in a translation unit
-// containing maib
+// containing main. Though experts might not want to :-)
 #define DEFINE_MEM_LEAK_DETECTOR_VARIABLES
 #include "leak_detector.h"
 
