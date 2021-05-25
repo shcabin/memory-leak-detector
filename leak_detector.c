@@ -3,9 +3,9 @@
 #include <string.h>
 #include <assert.h>
 
-
 #include "leak_detector_types.h"
 
+#define ERROR(...) fprintf(stderr, __VA_ARGS__)
 extern MEM_LEAK *ptr_start;
 extern MEM_LEAK *ptr_next;
 extern MEM_LEAK_ctx leak_ctx;
@@ -152,9 +152,7 @@ xstrdup (const char *str, const char *file, unsigned int line,
 {
   char *ptr = strdup (str);
   if (ptr != NULL)
-    {
       add_mem_info (ptr, strlen (str) + 1, file, line, func);
-    }
   return ptr;
 }
 
@@ -167,9 +165,7 @@ xmalloc (unsigned int size, const char *file, unsigned int line,
 {
   void *ptr = malloc (size);
   if (ptr != NULL)
-    {
       add_mem_info (ptr, size, file, line, func);
-    }
   return ptr;
 }
 
@@ -257,8 +253,8 @@ remove_mem_info (void *mem_ref, const char *file, unsigned int line,
   MUTEX_UNLOCK (leak_ctx.g_cs);
   if (flag == 0)
     {
-      fprintf (stderr,
-               " %p in %s %s:%d attempting to free an unknown address %p\n",
+      ERROR (
+               "[LD] %p in %s %s:%d attempting to free an unknown address %p\n",
                mem_ref, func, file, line, mem_ref);
                return;
     }
@@ -338,21 +334,21 @@ report_mem_leak (void)
   int print_size;
   if (ptr_start != NULL)
     {
-      puts ("Memory Leak Summary");
-      puts ("-----------------------------------");
-      puts ("REPORT THIS LEAK TO https://github.com/harieamjari/dats");
+      ERROR ("Memory Leak Summary\n");
+      ERROR ("-----------------------------------\n");
+      ERROR (" \n");
 
-      fprintf (stdout, "leak total:%d,max used size:%d,once max:%d\n\n",
+      ERROR ("leak total:%d,max used size:%d,once max:%d\n\n",
                leak_ctx.total, leak_ctx.used_max, leak_ctx.once_max);
 
       int i = 0;
       for (leak_info = ptr_start; leak_info != NULL;
            leak_info = leak_info->next)
         {
-          fprintf (stdout, "#%d %p in %s %s:%d\n", i++,
+          ERROR ("#%d %p in %s %s:%d\n", i++,
                    leak_info->mem_info.address, leak_info->mem_info.func_name,
                    leak_info->mem_info.file_name, leak_info->mem_info.line);
-          fprintf (stdout, "address : 0x%8x    size    : %d bytes\n",
+          ERROR ("address : 0x%8x    size    : %d bytes\n",
                    (int) leak_info->mem_info.address,
                    leak_info->mem_info.size);
 
@@ -360,12 +356,12 @@ report_mem_leak (void)
             leak_info->mem_info.size > 64 ? 64 : leak_info->mem_info.size;
           ld_hex_printout (info, (char *) leak_info->mem_info.address,
                            print_size, 16);
-          fwrite (info, (strlen (info)), 1, stdout);
+          fwrite (info, (strlen (info)), 1, stderr);
 
-          putchar ('\n');
+          ERROR(" \n");
         }
-      fflush (stdout);
-      fprintf (stdout, "-----------------------------------\n");
+      fflush (stderr);
+      ERROR ("-----------------------------------\n");
     }
   clear ();
   MUTEX_DESTROY (leak_ctx.g_cs);

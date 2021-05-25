@@ -1,0 +1,23 @@
+[LD] 0x3039 in main main.c:12 attempting to free an unknown address 0x3039
+Memory Leak Summary
+-----------------------------------
+ 
+leak total:28,max used size:28,once max:12
+
+#0 0xb6d8a008 in main main.c:14
+address : 0xb6d8a008    size    : 4 bytes
+    00 00 00 00                                        ....
+ 
+#1 0xb6d8a010 in main main.c:14
+address : 0xb6d8a010    size    : 8 bytes
+    00 00 00 00 00 00 00 00                            ........
+ 
+#2 0xb6d90000 in main main.c:14
+address : 0xb6d90000    size    : 12 bytes
+    00 00 00 00 00 00 00 00 00 00 00 00                ............
+ 
+#3 0xb6d8a018 in spew_leak unit.c:5
+address : 0xb6d8a018    size    : 4 bytes
+    00 00 00 00                                        ....
+ 
+-----------------------------------
